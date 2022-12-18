@@ -1,5 +1,5 @@
 require('dotenv').config();
-require(__dirname+'/auth');
+require(__dirname+'/auth'); // auth.js
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -8,7 +8,7 @@ const passport = require('passport');
 const fs = require('fs-extra');
 const { dirname } = require('path');
 
-// CONFIGURE
+// CONFIGURE APP
 const app = express();
 app.use(express.static('public'));
 app.use(session({
@@ -27,14 +27,16 @@ const tempDir = __dirname+'/users/tmp/';
 const upload = multer({dest: tempDir});
 var oldPath, newPath;
 
-// Function to move file ---------------TODO
 
+// ROUTES ---
 
-// ROUTES
+// Login
 app.get('/',(req,res) => {
     res.sendFile(__dirname+'/public/html/login.html');
 });
 
+
+// Google Auth Routes
 app.get('/auth/google',
     passport.authenticate('google', {scope: ['email','profile']})
 );
@@ -48,19 +50,28 @@ app.get('/auth/failure', (req,res) => {
     res.sendFile(__dirname+'/public/html/error.html');
 });
 
+
+// Dashboard / Main
 app.get('/main', isLoggedIn, (req,res) => {
+
+    // Get username from user's email (gmail)
     const userName = req.user._json.email.split('@')[0];
+
+    // set newPath to users/<userName>/
     newPath = __dirname+'/users/'+userName+'/';
     res.sendFile(__dirname+'/public/html/main.html');
 });
 
 
-// *** UPLOAD A PDF ***
+// Upload - GET
 app.get('/upload', isLoggedIn, (req,res) => {
     res.sendFile(__dirname+'/public/html/upload.html');
 });
 
+// Upload - POST
 app.post('/upload', isLoggedIn, upload.single('file'), (req,res) => {
+
+    // set oldPath to path of file uploaded by multer in /tmp
     oldPath = req.file.path;
     
     // make directory for user if non existent
@@ -71,7 +82,7 @@ app.post('/upload', isLoggedIn, upload.single('file'), (req,res) => {
     // console.log(req.file);
     newPath+=req.file.originalname;
 
-    // move uploaded file from tmp to user dialhr
+    // move uploaded file from tmp to user's folder
     fs.move(oldPath, newPath, (err) => {
         if(err) console.log(err)
     });
@@ -79,14 +90,21 @@ app.post('/upload', isLoggedIn, upload.single('file'), (req,res) => {
     res.redirect('/main');
 })
 
+
+// Retrieve uploaded files
 app.get('/retrieve', isLoggedIn, (req,res) => {
     res.sendFile(__dirname+'/public/html/retrieve.html');
 });
 
+
+// Logout
 app.get('/logout', isLoggedIn, (req,res) => {
     req.session.destroy((err) => {
         res.sendFile(__dirname+'/public/html/logout.html');
     });
 });
 
+
+// ----------------------------------------------------------------------------
+// SERVER
 app.listen(5000, () => console.log('Server started on port 5000'));
