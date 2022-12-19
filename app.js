@@ -11,6 +11,7 @@ const { dirname } = require('path');
 // CONFIGURE APP
 const app = express();
 app.use(express.static('public'));
+// app.use('view engine',ejs);
 app.use(session({
     secret: process.env.SECRET,
     resave: true,
@@ -18,6 +19,7 @@ app.use(session({
 }))
 app.use(passport.initialize());
 app.use(passport.session());
+app.set('view engine', 'ejs');
 
 // Function to check if user is logged in
 const isLoggedIn = (req,res,next) => req.user ? next() : res.sendStatus(401);
@@ -25,7 +27,7 @@ const isLoggedIn = (req,res,next) => req.user ? next() : res.sendStatus(401);
 // MULTER
 const tempDir = __dirname+'/users/tmp/';
 const upload = multer({dest: tempDir});
-var oldPath, newPath;
+var oldPath, newPath, userName;
 
 
 // ROUTES ---
@@ -55,7 +57,7 @@ app.get('/auth/failure', (req,res) => {
 app.get('/main', isLoggedIn, (req,res) => {
 
     // Get username from user's email (gmail)
-    const userName = req.user._json.email.split('@')[0];
+    userName = req.user._json.email.split('@')[0];
 
     // set newPath to users/<userName>/
     newPath = __dirname+'/users/'+userName+'/';
@@ -80,7 +82,7 @@ app.post('/upload', isLoggedIn, upload.single('file'), (req,res) => {
     }
 
     // console.log(req.file);
-    newPath+=req.file.originalname;
+    newPath+=(req.file.originalname.split(' ').join('_'));
 
     // move uploaded file from tmp to user's folder
     fs.move(oldPath, newPath, (err) => {
@@ -93,8 +95,34 @@ app.post('/upload', isLoggedIn, upload.single('file'), (req,res) => {
 
 // Retrieve uploaded files
 app.get('/retrieve', isLoggedIn, (req,res) => {
-    res.sendFile(__dirname+'/public/html/retrieve.html');
+
+    const userDir = __dirname+'/users/'+userName+'/';
+    const filesOb = {
+        fileCount: 0,
+        files: [],
+        filePath: userDir,
+    };
+
+    console.log(filesOb);
+
+    fs.readdir(userDir, (err, files) => {
+        filesOb.fileCount = files.length;
+        filesOb.files = files;
+        // console.log(userFiles);
+
+
+        // TODO: DISPLAY TABLE OF FILES AND ALLOW USER TO DOWNLOAD FILES
+        res.render('retrieve',{filesOb});
+    });
 });
+
+// Download a file 
+app.get('/retrieve/:fileName', isLoggedIn, (req,res) => {
+    const userDir = __dirname+'/users/'+userName+'/';
+    const filePath = userDir + req.params.fileName;
+    
+    res.download(filePath, req.params.fileName);
+})
 
 
 // Logout
