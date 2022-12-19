@@ -1,3 +1,5 @@
+// Auth file for passport-google-oauth2
+
 const passport = require('passport');
 const GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
 
