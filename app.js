@@ -103,8 +103,6 @@ app.get('/retrieve', isLoggedIn, (req,res) => {
         filePath: userDir,
     };
 
-    console.log(filesOb);
-
     fs.readdir(userDir, (err, files) => {
         filesOb.fileCount = files.length;
         filesOb.files = files;
