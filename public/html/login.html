@@ -7,9 +7,91 @@
 
     <title>Fyles - Login</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.svg">
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Nunito:wght@300;400;500&display=swap');
+
+        *{
+            margin: none;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-weight: 500;
+        }
+
+        body{
+            height: 100vh;
+            background-color: rgb(30, 30, 30);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow-y: hidden;
+        }
+
+        h1{
+            color: rgb(241, 209, 65);
+        }
+
+        .textContainer{
+            width: 100%;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .container{
+            border-radius: 1rem;
+            width: 90%;
+            height: 90%;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            row-gap: 2rem;
+
+            background-color: rgb(39, 39, 39);
+        }
+
+        .loginButton{
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 1rem;
+            background-color: rgb(235, 235, 235);
+
+            transition: 200ms;
+        }
+
+        .loginButton:hover{
+            cursor: pointer;
+            background-color: rgb(201, 201, 201);
+        }
+
+        a{
+            text-decoration: none;
+            font-size: 1rem;
+
+            color: black;
+        }
+
+        img{
+            width: 2rem
+        }
+
+    </style>
 </head>
 <body>
     <div class="container">
+
+        <div class="textContainer">
+            <h1>ADG File Upload Task</h1> 
+            <img src="/images/favicon.svg" alt="">
+        </div>
 
         <button class="loginButton">
             <a href="/auth/google">Sign In</a>
